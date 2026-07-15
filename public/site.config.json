@@ -1,0 +1,45 @@
+{
+  "configVersion": 5,
+  "siteTitle": "SeeHex",
+  "domain": "seehex.com",
+  "name": "SeeHex",
+  "headlinePrefix": "This is",
+  "avatarDark": "/avatar-dark.png",
+  "avatarLight": "/avatar-light.png",
+  "status": "online",
+  "typingTexts": [
+    "build / ship / iterate",
+    "tools, notes, links",
+    "seehex.com"
+  ],
+  "contacts": [
+    "x@seehex.com"
+  ],
+  "github": "https://github.com/vexeno",
+  "cards": [
+    {
+      "label": "ImgBed",
+      "href": "https://img.seehex.com",
+      "icon": "fa-regular fa-images",
+      "color": "#a78bfa"
+    },
+    {
+      "label": "Domains",
+      "href": "https://mi.seehex.com",
+      "icon": "fa-solid fa-globe",
+      "color": "#facc15"
+    },
+    {
+      "label": "Status",
+      "href": "https://status.seehex.com",
+      "icon": "fa-solid fa-signal",
+      "color": "#22c55e"
+    },
+    {
+      "label": "Contact",
+      "href": "https://t.me/vyoss",
+      "icon": "fa-regular fa-paper-plane",
+      "color": "#38bdf8"
+    }
+  ]
+}
