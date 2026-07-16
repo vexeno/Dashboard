@@ -10,15 +10,38 @@ const defaultConfig = {
   avatarDark: '/avatar-dark.png',
   avatarLight: '/avatar-light.png',
   status: 'online',
-  typingTexts: ['build / ship / iterate', 'tools, notes, links', 'seehex.com'],
+  typingTexts: ['LESS IS MORE'],
   contacts: ['x@seehex.com'],
   github: 'https://github.com/vexeno',
-  cards: [],
+  cards: [
+    {
+      label: 'ImgBed',
+      href: 'https://img.seehex.com',
+      icon: 'fa-regular fa-images',
+      color: '#a78bfa',
+    },
+    {
+      label: 'Domains',
+      href: 'https://mi.seehex.com',
+      icon: 'fa-solid fa-globe',
+      color: '#facc15',
+    },
+    {
+      label: 'Status',
+      href: 'https://status.seehex.com',
+      icon: 'fa-solid fa-signal',
+      color: '#22c55e',
+    },
+    {
+      label: 'Contact',
+      href: 'https://t.me/vyoss',
+      icon: 'fa-regular fa-paper-plane',
+      color: '#38bdf8',
+    },
+  ],
 }
 
 const typingSpeed = 125
-const deletingSpeed = 70
-const pauseTime = 1300
 const storageKey = 'seehex-home-config'
 
 const config = ref({ ...defaultConfig })
@@ -30,13 +53,22 @@ const activeCard = ref(null)
 const cardHoverTimers = new Map()
 const elapsedSeconds = ref(0)
 const typedText = ref('')
+const clickSparkCanvas = ref(null)
 const editorText = ref('')
 const editorError = ref('')
 let timerId
 let typingTimerId
-let typingTextIndex = 0
 let typingCharIndex = 0
-let isDeleting = false
+let clickSparkAnimationId
+const clickSparks = []
+const clickSparkOptions = {
+  color: '#facc15',
+  size: 10,
+  radius: 20,
+  count: 8,
+  duration: 420,
+  extraScale: 1,
+}
 
 const typingTexts = computed(() => {
   const texts = config.value.typingTexts?.filter(Boolean)
@@ -44,6 +76,28 @@ const typingTexts = computed(() => {
 })
 
 const currentAvatar = computed(() => (isDark.value ? config.value.avatarDark : config.value.avatarLight))
+
+
+const splitSegmenter = typeof Intl !== 'undefined' && Intl.Segmenter
+  ? new Intl.Segmenter(undefined, { granularity: 'grapheme' })
+  : null
+
+function splitTextChars(text) {
+  const value = String(text || '')
+  const chars = splitSegmenter
+    ? Array.from(splitSegmenter.segment(value), (part) => part.segment)
+    : Array.from(value)
+
+  return chars.map((char) => ({
+    char,
+    display: char === ' ' ? '\u00a0' : char,
+  }))
+}
+
+const hiChars = computed(() => splitTextChars('Hi'))
+const headlinePrefixChars = computed(() => splitTextChars(config.value.headlinePrefix))
+const headlineNameChars = computed(() => splitTextChars(config.value.name))
+const headlineLabel = computed(() => [config.value.headlinePrefix, config.value.name].filter(Boolean).join(' '))
 
 const formattedTime = computed(() => {
   const hours = String(Math.floor(elapsedSeconds.value / 3600)).padStart(2, '0')
@@ -157,44 +211,117 @@ function downloadConfig() {
 
 function resetTyping() {
   window.clearTimeout(typingTimerId)
-  typingTextIndex = 0
+  stopClickSpark()
   typingCharIndex = 0
-  isDeleting = false
   typedText.value = ''
   typeNextFrame()
 }
 
 function typeNextFrame() {
-  const texts = typingTexts.value
-  const currentText = texts[typingTextIndex] || ''
+  const currentText = typingTexts.value[0] || ''
 
-  if (isDeleting) {
-    typingCharIndex -= 1
-    typedText.value = currentText.slice(0, typingCharIndex)
-  } else {
-    typingCharIndex += 1
-    typedText.value = currentText.slice(0, typingCharIndex)
+  if (typingCharIndex >= currentText.length) {
+    typedText.value = currentText
+    return
   }
 
-  let delay = isDeleting ? deletingSpeed : typingSpeed
+  typingCharIndex += 1
+  typedText.value = currentText.slice(0, typingCharIndex)
+  typingTimerId = window.setTimeout(typeNextFrame, typingSpeed)
+}
 
-  if (!isDeleting && typingCharIndex === currentText.length) {
-    delay = pauseTime
-    isDeleting = true
+function resizeClickSparkCanvas() {
+  const canvas = clickSparkCanvas.value
+  if (!canvas) return
+
+  const ratio = Math.min(window.devicePixelRatio || 1, 2)
+  const width = window.innerWidth
+  const height = window.innerHeight
+  canvas.width = Math.floor(width * ratio)
+  canvas.height = Math.floor(height * ratio)
+  canvas.style.width = width + 'px'
+  canvas.style.height = height + 'px'
+
+  const ctx = canvas.getContext('2d')
+  if (ctx) {
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0)
+  }
+}
+
+function clickSparkEase(progress) {
+  return progress * (2 - progress)
+}
+
+function drawClickSparks(timestamp) {
+  const canvas = clickSparkCanvas.value
+  const ctx = canvas?.getContext('2d')
+  if (!canvas || !ctx) return
+
+  ctx.clearRect(0, 0, window.innerWidth, window.innerHeight)
+
+  for (let index = clickSparks.length - 1; index >= 0; index -= 1) {
+    const spark = clickSparks[index]
+    const elapsed = timestamp - spark.startTime
+
+    if (elapsed >= clickSparkOptions.duration) {
+      clickSparks.splice(index, 1)
+      continue
+    }
+
+    const progress = elapsed / clickSparkOptions.duration
+    const eased = clickSparkEase(progress)
+    const distance = eased * clickSparkOptions.radius * clickSparkOptions.extraScale
+    const lineLength = clickSparkOptions.size * (1 - eased)
+    const x1 = spark.x + distance * Math.cos(spark.angle)
+    const y1 = spark.y + distance * Math.sin(spark.angle)
+    const x2 = spark.x + (distance + lineLength) * Math.cos(spark.angle)
+    const y2 = spark.y + (distance + lineLength) * Math.sin(spark.angle)
+
+    ctx.strokeStyle = clickSparkOptions.color
+    ctx.lineWidth = 2
+    ctx.lineCap = 'round'
+    ctx.beginPath()
+    ctx.moveTo(x1, y1)
+    ctx.lineTo(x2, y2)
+    ctx.stroke()
   }
 
-  if (isDeleting && typingCharIndex === 0) {
-    isDeleting = false
-    typingTextIndex = (typingTextIndex + 1) % texts.length
-    delay = 360
-  }
+  clickSparkAnimationId = window.requestAnimationFrame(drawClickSparks)
+}
 
-  typingTimerId = window.setTimeout(typeNextFrame, delay)
+function handleClickSpark(event) {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  const now = performance.now()
+  for (let index = 0; index < clickSparkOptions.count; index += 1) {
+    clickSparks.push({
+      x: event.clientX,
+      y: event.clientY,
+      angle: (Math.PI * 2 * index) / clickSparkOptions.count,
+      startTime: now,
+    })
+  }
+}
+
+function startClickSpark() {
+  resizeClickSparkCanvas()
+  window.addEventListener('resize', resizeClickSparkCanvas)
+  window.addEventListener('click', handleClickSpark, true)
+  clickSparkAnimationId = window.requestAnimationFrame(drawClickSparks)
+}
+
+function stopClickSpark() {
+  window.removeEventListener('resize', resizeClickSparkCanvas)
+  window.removeEventListener('click', handleClickSpark, true)
+  if (clickSparkAnimationId) {
+    window.cancelAnimationFrame(clickSparkAnimationId)
+  }
+  clickSparks.length = 0
 }
 
 onMounted(async () => {
   await loadConfig()
   typeNextFrame()
+  startClickSpark()
 
   timerId = window.setInterval(() => {
     elapsedSeconds.value += 1
@@ -211,6 +338,7 @@ onUnmounted(() => {
 
 <template>
   <main class="page" :class="{ 'dark-mode': isDark }">
+    <canvas ref="clickSparkCanvas" class="click-spark-canvas" aria-hidden="true"></canvas>
     <section class="hero" aria-label="个人导航页">
       <div class="profile">
         <div class="avatar-wrap">
@@ -218,8 +346,35 @@ onUnmounted(() => {
         </div>
 
         <div class="intro">
-          <h1 class="title-hi">Hi</h1>
-          <h1 class="title-main">{{ config.headlinePrefix }} <span class="name-style">{{ config.name }}</span></h1>
+          <h1 class="title-hi seehex-split-title" aria-label="Hi">
+            <span aria-hidden="true" class="seehex-split-line">
+              <span
+                v-for="(part, index) in hiChars"
+                :key="'hi-' + index + '-' + part.char"
+                class="seehex-split-char"
+                :style="{ '--i': index, '--split-base': 0 }"
+              >{{ part.display }}</span>
+            </span>
+          </h1>
+          <h1 class="title-main seehex-split-title" :aria-label="headlineLabel">
+            <span aria-hidden="true" class="seehex-split-line">
+              <span
+                v-for="(part, index) in headlinePrefixChars"
+                :key="'prefix-' + index + '-' + part.char"
+                class="seehex-split-char"
+                :style="{ '--i': index, '--split-base': 5 }"
+              >{{ part.display }}</span>
+              <span class="seehex-split-char" :style="{ '--i': headlinePrefixChars.length, '--split-base': 5 }">&nbsp;</span>
+              <span class="name-style">
+                <span
+                  v-for="(part, index) in headlineNameChars"
+                  :key="'name-' + index + '-' + part.char"
+                  class="seehex-split-char"
+                  :style="{ '--i': headlinePrefixChars.length + 1 + index, '--split-base': 5 }"
+                >{{ part.display }}</span>
+              </span>
+            </span>
+          </h1>
           <p class="quote" aria-label="签名">
             <span class="quote-mark">“</span>
             <span class="typing-wrap"><span class="typing">{{ typedText }}</span><span class="caret"></span></span>

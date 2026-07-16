@@ -101,7 +101,6 @@ code {
   flex-direction: column;
   align-items: center;
   gap: 24px;
-  animation: page-in 0.7s ease both;
 }
 
 .profile {
@@ -124,6 +123,7 @@ code {
   height: 150px;
   border-radius: 50%;
   object-fit: cover;
+  object-position: center 58%;
   border: 5px solid rgba(255, 255, 255, 0.45);
   box-shadow: var(--shadow);
   transform-style: preserve-3d;
@@ -168,15 +168,18 @@ code {
 
 .intro h1 .name-style::before {
   position: absolute;
-  left: 50%;
+  left: -0.07em;
+  right: -0.26em;
   bottom: 5px;
-  width: 110%;
   height: 30%;
   content: "";
-  border-radius: 5px;
+  border-radius: 999px;
   background: rgba(250, 204, 21, 0.68);
-  transform: translateX(-50%);
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
   transition: height 0.28s ease;
+  animation: seehexHighlightReveal 0.58s cubic-bezier(0.22, 1, 0.36, 1) 1.05s forwards;
   z-index: -1;
 }
 
@@ -629,4 +632,74 @@ code {
   .site-card span {
     font-size: 13px;
   }
+}
+
+
+/* SplitText-style animation scoped only to the two hero title lines */
+.intro .seehex-split-title {
+  overflow: hidden;
+}
+
+.intro .seehex-split-title .seehex-split-line {
+  display: inline-block;
+  overflow: hidden;
+  white-space: inherit;
+}
+
+
+.intro .title-main.seehex-split-title,
+.intro .title-main .seehex-split-line {
+  padding-right: 0.32em;
+  margin-right: -0.32em;
+}
+
+.intro .seehex-split-title .seehex-split-char {
+  display: inline-block;
+  opacity: 0;
+  transform: translate3d(0, 40px, 0);
+  will-change: transform, opacity;
+  animation: seehexSplitTextRise 1.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: calc((var(--split-base, 0) + var(--i, 0)) * 50ms);
+}
+
+.intro .title-main .name-style .seehex-split-char {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes seehexSplitTextRise {
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes seehexHighlightReveal {
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro .seehex-split-title .seehex-split-char {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+
+  .intro h1 .name-style::before {
+    opacity: 1;
+    transform: scaleX(1);
+    animation: none;
+  }
+}
+
+
+.click-spark-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  user-select: none;
 }
