@@ -96,6 +96,8 @@ code {
 }
 
 .hero {
+  position: relative;
+  z-index: 1;
   width: min(760px, 100%);
   display: flex;
   flex-direction: column;
@@ -371,6 +373,8 @@ code {
 }
 
 .visit-timer {
+  --spotlight-x: 50%;
+  --spotlight-y: 50%;
   position: fixed;
   left: 50%;
   bottom: 28px;
@@ -387,6 +391,33 @@ code {
   backdrop-filter: blur(16px);
   transform: translateX(-50%);
   font-size: 14px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.visit-timer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at var(--spotlight-x) var(--spotlight-y),
+    rgba(255, 255, 255, 0.25),
+    transparent 80%
+  );
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.visit-timer:hover::before {
+  opacity: 1;
+}
+
+.visit-timer > * {
+  position: relative;
+  z-index: 1;
 }
 
 .visit-timer i {
@@ -694,6 +725,8 @@ code {
     animation: none;
   }
 }
+
+
 
 
 .click-spark-canvas {

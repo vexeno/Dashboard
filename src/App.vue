@@ -107,6 +107,17 @@ const formattedTime = computed(() => {
   return { hours, minutes, seconds }
 })
 
+function moveTimerSpotlight(event) {
+  const timer = event.currentTarget
+  const rect = timer.getBoundingClientRect()
+  const x = event.clientX - rect.left
+  const y = event.clientY - rect.top
+
+  timer.style.setProperty('--spotlight-x', x + 'px')
+  timer.style.setProperty('--spotlight-y', y + 'px')
+}
+
+
 async function loadConfig() {
   try {
     const response = await fetch('/site.config.json', { cache: 'no-store' })
@@ -333,6 +344,7 @@ onUnmounted(() => {
   window.clearTimeout(typingTimerId)
   cardHoverTimers.forEach((hoverTimer) => window.clearTimeout(hoverTimer))
   cardHoverTimers.clear()
+  stopClickSpark()
 })
 </script>
 
@@ -433,7 +445,7 @@ onUnmounted(() => {
       </nav>
     </section>
 
-    <div class="visit-timer" aria-label="停留时间">
+    <div class="visit-timer" aria-label="停留时间" @mousemove="moveTimerSpotlight">
       <i class="fa-regular fa-clock"></i>
       <span>uptime :</span>
       <strong>{{ formattedTime.hours }}</strong>
