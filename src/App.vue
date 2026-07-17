@@ -7,8 +7,8 @@ const defaultConfig = {
   domain: 'seehex.com',
   name: 'SeeHex',
   headlinePrefix: 'This is',
-  avatarDark: '/avatar-dark.png',
-  avatarLight: '/avatar-light.png',
+  avatarDark: '/logoX.png',
+  avatarLight: '/LogoX_BLACK.png',
   status: 'online',
   typingTexts: ['LESS IS MORE'],
   contacts: ['x@seehex.com'],
@@ -354,7 +354,7 @@ onUnmounted(() => {
     <section class="hero" aria-label="个人导航页">
       <div class="profile">
         <div class="avatar-wrap">
-          <img class="avatar" :src="currentAvatar" alt="头像" />
+          <img class="avatar" :src="currentAvatar" alt="SeeHex Logo" />
         </div>
 
         <div class="intro">

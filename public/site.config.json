@@ -4,8 +4,8 @@
   "domain": "seehex.com",
   "name": "SeeHex",
   "headlinePrefix": "This is",
-  "avatarDark": "/avatar-dark.png",
-  "avatarLight": "/avatar-light.png",
+  "avatarDark": "/logoX.png",
+  "avatarLight": "/LogoX_BLACK.png",
   "status": "online",
   "typingTexts": [
     "LESS IS MORE"
