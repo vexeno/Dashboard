@@ -134,6 +134,22 @@ function moveTimerSpotlight(event) {
   timer.style.setProperty('--spotlight-y', y + 'px')
 }
 
+function moveCardGlow(event) {
+  const card = event.currentTarget
+  const rect = card.getBoundingClientRect()
+  const x = event.clientX - rect.left
+  const y = event.clientY - rect.top
+
+  card.style.setProperty('--glow-x', x + 'px')
+  card.style.setProperty('--glow-y', y + 'px')
+}
+
+function resetCardGlow(event) {
+  const card = event.currentTarget
+  card.style.setProperty('--glow-x', '50%')
+  card.style.setProperty('--glow-y', '50%')
+}
+
 
 async function loadConfig() {
   try {
@@ -554,10 +570,11 @@ onUnmounted(() => {
           :target="card.href?.startsWith('http') ? '_blank' : undefined"
           rel="noreferrer"
           :style="{ '--card-accent': card.color || '#facc15' }"
+          @mousemove="moveCardGlow"
           @mouseenter="queueCardFill(`${card.label}-${card.href}`)"
-          @mouseleave="clearCardFill(`${card.label}-${card.href}`)"
+          @mouseleave="clearCardFill(`${card.label}-${card.href}`); resetCardGlow($event)"
           @focus="queueCardFill(`${card.label}-${card.href}`)"
-          @blur="clearCardFill(`${card.label}-${card.href}`)"
+          @blur="clearCardFill(`${card.label}-${card.href}`); resetCardGlow($event)"
         >
           <i :class="card.icon || 'fa-solid fa-link'"></i>
           <span>{{ card.label }}</span>
@@ -573,7 +590,9 @@ onUnmounted(() => {
       <span>:</span>
       <strong>{{ formattedTime.minutes }}</strong>
       <span>:</span>
-      <strong>{{ formattedTime.seconds }}</strong>
+      <Transition name="timer-tick" mode="out-in">
+        <strong :key="formattedTime.seconds">{{ formattedTime.seconds }}</strong>
+      </Transition>
     </div>
 
     <Transition name="fade">
