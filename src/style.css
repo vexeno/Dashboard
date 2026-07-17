@@ -441,6 +441,30 @@ code {
   transition: transform 0.32s ease, box-shadow 0.32s ease, border-color 0.32s ease, color 0.32s ease;
 }
 
+.site-card:nth-child(1) {
+  --blob-delay: -0.7s;
+  --spark-delay: -2.1s;
+  --blob-rotate: 13deg;
+}
+
+.site-card:nth-child(2) {
+  --blob-delay: -2.8s;
+  --spark-delay: -0.6s;
+  --blob-rotate: -10deg;
+}
+
+.site-card:nth-child(3) {
+  --blob-delay: -1.6s;
+  --spark-delay: -3.4s;
+  --blob-rotate: 18deg;
+}
+
+.site-card:nth-child(4) {
+  --blob-delay: -3.7s;
+  --spark-delay: -1.3s;
+  --blob-rotate: -16deg;
+}
+
 .site-card::before,
 .site-card::after {
   position: absolute;
@@ -450,75 +474,77 @@ code {
 }
 
 .site-card::before {
-  width: 92px;
-  height: 92px;
-  left: -38px;
-  bottom: -42px;
-  border-radius: 42% 58% 65% 35% / 45% 38% 62% 55%;
+  width: 96px;
+  height: 84px;
+  left: -36px;
+  bottom: -34px;
+  border-radius: 46% 54% 62% 38% / 42% 48% 52% 58%;
   background:
-    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.55), transparent 32%),
+    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.58), transparent 30%),
+    radial-gradient(circle at 66% 68%, color-mix(in srgb, var(--card-accent) 66%, transparent), transparent 48%),
     var(--card-accent);
-  filter: blur(14px) saturate(1.15);
+  filter: blur(15px) saturate(1.22);
   opacity: 0.34;
-  transform: translate3d(0, 0, 0) rotate(0deg) scale(0.9);
+  transform: translate3d(0, 0, 0) rotate(var(--blob-rotate, 0deg)) scale(0.92);
+  transform-origin: 32% 72%;
+  animation: card-main-blob 7.6s ease-in-out infinite;
+  animation-delay: var(--blob-delay, 0s);
   transition:
-    width 0.85s cubic-bezier(0.19, 1, 0.22, 1),
-    height 0.85s cubic-bezier(0.19, 1, 0.22, 1),
-    left 0.85s cubic-bezier(0.19, 1, 0.22, 1),
-    bottom 0.85s cubic-bezier(0.19, 1, 0.22, 1),
-    border-radius 0.85s cubic-bezier(0.19, 1, 0.22, 1),
+    width 0.9s cubic-bezier(0.19, 1, 0.22, 1),
+    height 0.9s cubic-bezier(0.19, 1, 0.22, 1),
+    left 0.9s cubic-bezier(0.19, 1, 0.22, 1),
+    bottom 0.9s cubic-bezier(0.19, 1, 0.22, 1),
+    border-radius 0.9s cubic-bezier(0.19, 1, 0.22, 1),
     opacity 0.35s ease,
-    transform 0.85s cubic-bezier(0.19, 1, 0.22, 1),
+    transform 0.9s cubic-bezier(0.19, 1, 0.22, 1),
     filter 0.45s ease;
 }
 
 .site-card::after {
-  width: 78px;
-  height: 78px;
-  right: -46px;
-  top: -44px;
-  border-radius: 64% 36% 44% 56% / 52% 60% 40% 48%;
-  background: color-mix(in srgb, var(--card-accent) 78%, #ffffff);
-  filter: blur(18px) saturate(1.2);
-  opacity: 0;
-  transform: rotate(-18deg) scale(0.72);
-  transition:
-    opacity 0.38s ease,
-    transform 0.8s cubic-bezier(0.19, 1, 0.22, 1),
-    right 0.8s cubic-bezier(0.19, 1, 0.22, 1),
-    top 0.8s cubic-bezier(0.19, 1, 0.22, 1),
-    border-radius 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+  inset: -24px;
+  background:
+    radial-gradient(circle at 24% 68%, color-mix(in srgb, var(--card-accent) 58%, transparent) 0 8px, transparent 18px),
+    radial-gradient(circle at 36% 46%, color-mix(in srgb, var(--card-accent) 44%, transparent) 0 5px, transparent 15px),
+    radial-gradient(circle at 58% 72%, color-mix(in srgb, var(--card-accent) 42%, transparent) 0 7px, transparent 20px),
+    radial-gradient(circle at 76% 34%, color-mix(in srgb, var(--card-accent) 34%, transparent) 0 4px, transparent 14px),
+    radial-gradient(circle at 86% 78%, color-mix(in srgb, var(--card-accent) 32%, transparent) 0 3px, transparent 12px);
+  background-repeat: no-repeat;
+  filter: blur(9px) saturate(1.35);
+  opacity: 0.24;
+  transform: translate3d(0, 0, 0) scale(0.98);
+  animation: card-floating-specks 9.2s ease-in-out infinite;
+  animation-delay: var(--spark-delay, -1s);
+  transition: opacity 0.35s ease, filter 0.45s ease, transform 0.45s ease;
 }
 
 .site-card:hover,
 .site-card:focus-visible {
-  background: var(--card-bg);
+  background: color-mix(in srgb, var(--card-bg) 76%, var(--card-accent));
   box-shadow: 0 18px 38px rgba(0, 0, 0, 0.16);
-  border-color: color-mix(in srgb, var(--card-accent) 52%, var(--border));
+  border-color: color-mix(in srgb, var(--card-accent) 58%, var(--border));
   transform: translate3d(0, -5px, 0);
 }
 
 .site-card:hover::before,
 .site-card:focus-visible::before,
 .site-card.is-fill-active::before {
-  width: 260px;
-  height: 180px;
-  left: -64px;
-  bottom: -74px;
-  border-radius: 68% 32% 52% 48% / 42% 58% 42% 58%;
-  opacity: 0.72;
-  filter: blur(20px) saturate(1.35);
-  transform: rotate(13deg) scale(1.12);
+  width: 330px;
+  height: 230px;
+  left: -78px;
+  bottom: -104px;
+  border-radius: 72% 28% 48% 52% / 38% 60% 40% 62%;
+  opacity: 0.82;
+  filter: blur(24px) saturate(1.42);
+  animation-play-state: paused;
+  transform: translate3d(18px, -18px, 0) rotate(11deg) scale(1.08);
 }
 
 .site-card:hover::after,
 .site-card:focus-visible::after,
 .site-card.is-fill-active::after {
-  right: -28px;
-  top: -28px;
-  opacity: 0.34;
-  border-radius: 38% 62% 48% 52% / 56% 42% 58% 44%;
-  transform: rotate(16deg) scale(1.08);
+  opacity: 0.42;
+  filter: blur(12px) saturate(1.5);
+  transform: translate3d(6px, -4px, 0) scale(1.06);
 }
 
 .site-card:hover i,
@@ -526,6 +552,58 @@ code {
 .site-card:hover span,
 .site-card:focus-visible span {
   transform: translate3d(0, -1px, 0);
+}
+
+@keyframes card-main-blob {
+  0%, 100% {
+    border-radius: 46% 54% 62% 38% / 42% 48% 52% 58%;
+    opacity: 0.28;
+    transform: translate3d(-2px, 2px, 0) rotate(var(--blob-rotate, 0deg)) scale(0.82);
+  }
+
+  18% {
+    border-radius: 58% 42% 44% 56% / 55% 35% 65% 45%;
+    opacity: 0.46;
+    transform: translate3d(11px, -7px, 0) rotate(calc(var(--blob-rotate, 0deg) + 16deg)) scale(1.08);
+  }
+
+  43% {
+    border-radius: 36% 64% 58% 42% / 36% 62% 38% 64%;
+    opacity: 0.24;
+    transform: translate3d(24px, 5px, 0) rotate(calc(var(--blob-rotate, 0deg) - 11deg)) scale(0.74);
+  }
+
+  67% {
+    border-radius: 64% 36% 38% 62% / 48% 40% 60% 52%;
+    opacity: 0.42;
+    transform: translate3d(8px, -17px, 0) rotate(calc(var(--blob-rotate, 0deg) + 28deg)) scale(1.18);
+  }
+}
+
+@keyframes card-floating-specks {
+  0%, 100% {
+    opacity: 0.16;
+    background-position: 0 8px, 24px 2px, 82px 8px, 128px 4px, 154px 18px;
+    transform: translate3d(-4px, 4px, 0) scale(0.9) rotate(0deg);
+  }
+
+  24% {
+    opacity: 0.36;
+    background-position: 18px -4px, 48px 18px, 96px -2px, 118px 26px, 168px -6px;
+    transform: translate3d(8px, -6px, 0) scale(1.06) rotate(5deg);
+  }
+
+  52% {
+    opacity: 0.2;
+    background-position: 8px 24px, 62px -8px, 78px 28px, 148px 8px, 132px 34px;
+    transform: translate3d(16px, 4px, 0) scale(0.82) rotate(-7deg);
+  }
+
+  78% {
+    opacity: 0.42;
+    background-position: 28px 10px, 34px 32px, 112px 18px, 132px -10px, 174px 28px;
+    transform: translate3d(2px, -12px, 0) scale(1.12) rotate(9deg);
+  }
 }
 
 .site-card i {
