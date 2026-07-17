@@ -20,18 +20,42 @@
       --page-bg: #f7f4ec;
       --text: #222222;
       --muted: #6f6a5e;
-      --card-bg: rgba(255, 255, 255, 0.68);
-      --panel-bg: rgba(255, 255, 255, 0.78);
+      --card-bg: rgba(255, 255, 255, 0.7);
+      --panel-bg: rgba(255, 255, 255, 0.76);
+      --button-bg: rgba(255, 255, 255, 0.68);
+      --tag-bg: rgba(255, 255, 255, 0.62);
       --border: rgba(37, 34, 28, 0.12);
       --accent: #facc15;
       --accent-strong: #eab308;
-      --accent-soft: rgba(250, 204, 21, 0.2);
+      --accent-soft: rgba(250, 204, 21, 0.16);
       --radius: 22px;
       --pill-radius: 999px;
-      --shadow: 0 16px 50px rgba(93, 71, 23, 0.14);
-      --soft-shadow: 0 12px 34px rgba(93, 71, 23, 0.1);
+      --shadow: 0 16px 50px rgba(37, 34, 28, 0.12);
+      --soft-shadow: 0 12px 34px rgba(37, 34, 28, 0.09);
       --background-image: url('/puzzle-light.svg');
+      --page-overlay-a: rgba(255, 250, 235, 0.76);
+      --page-overlay-b: rgba(239, 234, 219, 0.76);
       color-scheme: light;
+    }
+
+    body.dark-mode {
+      --page-bg: #151515;
+      --text: #f4f1ea;
+      --muted: #b9b1a3;
+      --card-bg: rgba(32, 32, 32, 0.68);
+      --panel-bg: rgba(27, 27, 27, 0.76);
+      --button-bg: rgba(255, 255, 255, 0.06);
+      --tag-bg: rgba(255, 255, 255, 0.07);
+      --border: rgba(255, 255, 255, 0.12);
+      --accent: #facc15;
+      --accent-strong: #fde047;
+      --accent-soft: rgba(250, 204, 21, 0.12);
+      --shadow: 0 16px 50px rgba(0, 0, 0, 0.34);
+      --soft-shadow: 0 12px 34px rgba(0, 0, 0, 0.26);
+      --background-image: url('/puzzle-dark.svg');
+      --page-overlay-a: rgba(20, 20, 20, 0.78);
+      --page-overlay-b: rgba(28, 27, 24, 0.78);
+      color-scheme: dark;
     }
 
     * {
@@ -49,43 +73,15 @@
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at 20% 18%, rgba(250, 204, 21, 0.055), transparent 24%),
-        radial-gradient(circle at 82% 12%, rgba(180, 83, 9, 0.045), transparent 22%),
-        linear-gradient(135deg, rgba(255, 250, 235, 0.92), rgba(239, 234, 219, 0.92)),
-        var(--background-image) center/420px repeat,
+        linear-gradient(135deg, var(--page-overlay-a), var(--page-overlay-b)),
+        var(--background-image) center/340px repeat,
         var(--page-bg);
       overflow-x: hidden;
     }
 
     body::before,
     body::after {
-      position: fixed;
-      content: "";
-      pointer-events: none;
-      z-index: 0;
-      filter: blur(26px);
-      opacity: 0.24;
-      transform: translate3d(0, 0, 0);
-    }
-
-    body::before {
-      width: 190px;
-      height: 160px;
-      left: -82px;
-      top: 18%;
-      border-radius: 46% 54% 62% 38% / 42% 48% 52% 58%;
-      background: rgba(250, 204, 21, 0.12);
-      animation: page-blob 10s ease-in-out infinite;
-    }
-
-    body::after {
-      width: 220px;
-      height: 190px;
-      right: -96px;
-      bottom: 8%;
-      border-radius: 60% 40% 42% 58% / 50% 60% 40% 50%;
-      background: rgba(180, 83, 9, 0.07);
-      animation: page-blob 13s ease-in-out infinite reverse;
+      display: none;
     }
 
     a {
@@ -174,7 +170,7 @@
       padding: 0 18px;
       border: 1px solid var(--border);
       border-radius: var(--pill-radius);
-      background: rgba(255, 255, 255, 0.68);
+      background: var(--button-bg);
       color: var(--text);
       font-weight: 800;
       box-shadow: var(--soft-shadow);
@@ -203,7 +199,7 @@
       border: 1px solid var(--border);
       border-radius: 34px;
       padding: 18px;
-      background: rgba(255, 255, 255, 0.58);
+      background: var(--panel-bg);
       box-shadow: var(--shadow);
       backdrop-filter: blur(18px);
     }
@@ -255,7 +251,7 @@
     .domain-card:hover {
       transform: translateY(-5px);
       border-color: rgba(37, 34, 28, 0.18);
-      background: rgba(255, 255, 255, 0.82);
+      background: color-mix(in srgb, var(--card-bg) 88%, var(--text) 3%);
       box-shadow: 0 18px 38px rgba(37, 34, 28, 0.12);
     }
 
@@ -288,7 +284,7 @@
       padding: 0 11px;
       border: 1px solid rgba(37, 34, 28, 0.1);
       border-radius: var(--pill-radius);
-      background: rgba(255, 255, 255, 0.62);
+      background: var(--tag-bg);
       backdrop-filter: blur(10px);
     }
 
@@ -296,6 +292,12 @@
       color: #6b4d00;
       background: rgba(250, 204, 21, 0.22);
       border-color: rgba(250, 204, 21, 0.46);
+    }
+
+    body.dark-mode .price {
+      color: #f8e18a;
+      background: rgba(250, 204, 21, 0.12);
+      border-color: rgba(250, 204, 21, 0.24);
     }
 
     .contact-card {
@@ -330,27 +332,65 @@
       padding: 4px 0 0;
     }
 
-    @keyframes page-blob {
-      0%, 100% { transform: translate3d(0, 0, 0) scale(0.92) rotate(0deg); }
-      45% { transform: translate3d(36px, -24px, 0) scale(1.08) rotate(12deg); }
-      72% { transform: translate3d(14px, 20px, 0) scale(0.86) rotate(-8deg); }
+    .top-actions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: -6px;
     }
 
-    @keyframes hero-blob {
-      0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg) scale(0.96); }
-      50% { transform: translate3d(-18px, 20px, 0) rotate(12deg) scale(1.08); }
+    .theme-toggle {
+      display: inline-flex;
+      width: 46px;
+      height: 46px;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      border-radius: var(--pill-radius);
+      color: var(--text);
+      background: var(--button-bg);
+      box-shadow: var(--soft-shadow);
+      cursor: pointer;
+      backdrop-filter: blur(16px);
+      transition: transform 0.24s ease, background 0.24s ease, border-color 0.24s ease;
     }
 
-    @keyframes card-blob {
-      0%, 100% { opacity: 0.22; transform: translate3d(-2px, 2px, 0) scale(0.82) rotate(0deg); }
-      35% { opacity: 0.42; transform: translate3d(18px, -10px, 0) scale(1.1) rotate(16deg); }
-      68% { opacity: 0.26; transform: translate3d(28px, 5px, 0) scale(0.76) rotate(-10deg); }
+    .theme-toggle:hover {
+      transform: translateY(-2px);
+      border-color: rgba(250, 204, 21, 0.42);
     }
 
-    @keyframes card-specks {
-      0%, 100% { opacity: 0.16; transform: translate3d(-4px, 4px, 0) scale(0.92); }
-      34% { opacity: 0.36; transform: translate3d(10px, -8px, 0) scale(1.06); }
-      72% { opacity: 0.2; transform: translate3d(18px, 5px, 0) scale(0.84); }
+    .theme-toggle svg {
+      width: 20px;
+      height: 20px;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .theme-toggle .moon-icon {
+      display: none;
+    }
+
+    body.dark-mode .theme-toggle .sun-icon {
+      display: none;
+    }
+
+    body.dark-mode .theme-toggle .moon-icon {
+      display: block;
+    }
+
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation: none;
+      mix-blend-mode: normal;
+    }
+
+    ::view-transition-old(root) {
+      z-index: 0;
+    }
+
+    ::view-transition-new(root) {
+      z-index: 1;
     }
 
     @media (max-width: 760px) {
@@ -382,11 +422,31 @@
       .button {
         width: 100%;
       }
+
+      .top-actions {
+        margin-bottom: -8px;
+      }
+
+      .theme-toggle {
+        width: 44px;
+        height: 44px;
+      }
     }
 </style>
 </head>
 <body>
   <div class="page">
+    <div class="top-actions">
+      <button class="theme-toggle" type="button" aria-label="Toggle theme" title="Toggle theme">
+        <svg class="sun-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+        </svg>
+        <svg class="moon-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+    </div>
     <section class="domains-panel">
       <div class="panel-head">
         <div>
@@ -415,5 +475,53 @@
       </section>
     <footer>© SeeHex Domains</footer>
   </div>
+
+  <script>
+    const themeButton = document.querySelector('.theme-toggle');
+    const savedTheme = localStorage.getItem('domains-theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      document.body.classList.add('dark-mode');
+    }
+
+    async function toggleTheme(event) {
+      const applyTheme = () => {
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('domains-theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+      };
+
+      if (!document.startViewTransition) {
+        applyTheme();
+        return;
+      }
+
+      const x = event?.clientX ?? window.innerWidth / 2;
+      const y = event?.clientY ?? window.innerHeight / 2;
+      const endRadius = Math.hypot(
+        Math.max(x, window.innerWidth - x),
+        Math.max(y, window.innerHeight - y),
+      );
+
+      const transition = document.startViewTransition(applyTheme);
+      await transition.ready;
+
+      document.documentElement.animate(
+        {
+          clipPath: [
+            'circle(0px at ' + x + 'px ' + y + 'px)',
+            'circle(' + endRadius + 'px at ' + x + 'px ' + y + 'px)',
+          ],
+        },
+        {
+          duration: 650,
+          easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+          pseudoElement: '::view-transition-new(root)',
+        },
+      );
+    }
+
+    themeButton?.addEventListener('click', toggleTheme);
+  </script>
 </body>
 </html>
