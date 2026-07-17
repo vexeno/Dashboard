@@ -432,6 +432,7 @@ code {
   justify-content: center;
   gap: 11px;
   overflow: hidden;
+  isolation: isolate;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   color: var(--text);
@@ -440,28 +441,91 @@ code {
   transition: transform 0.32s ease, box-shadow 0.32s ease, border-color 0.32s ease, color 0.32s ease;
 }
 
-.site-card::before {
+.site-card::before,
+.site-card::after {
   position: absolute;
-  inset: 0;
   content: "";
-  background: var(--card-accent);
-  border-radius: inherit;
-  clip-path: circle(28px at 0 100%);
-  opacity: 0.36;
-  transition: clip-path 0.9s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.42s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.site-card::before {
+  width: 92px;
+  height: 92px;
+  left: -38px;
+  bottom: -42px;
+  border-radius: 42% 58% 65% 35% / 45% 38% 62% 55%;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.55), transparent 32%),
+    var(--card-accent);
+  filter: blur(14px) saturate(1.15);
+  opacity: 0.34;
+  transform: translate3d(0, 0, 0) rotate(0deg) scale(0.9);
+  transition:
+    width 0.85s cubic-bezier(0.19, 1, 0.22, 1),
+    height 0.85s cubic-bezier(0.19, 1, 0.22, 1),
+    left 0.85s cubic-bezier(0.19, 1, 0.22, 1),
+    bottom 0.85s cubic-bezier(0.19, 1, 0.22, 1),
+    border-radius 0.85s cubic-bezier(0.19, 1, 0.22, 1),
+    opacity 0.35s ease,
+    transform 0.85s cubic-bezier(0.19, 1, 0.22, 1),
+    filter 0.45s ease;
+}
+
+.site-card::after {
+  width: 78px;
+  height: 78px;
+  right: -46px;
+  top: -44px;
+  border-radius: 64% 36% 44% 56% / 52% 60% 40% 48%;
+  background: color-mix(in srgb, var(--card-accent) 78%, #ffffff);
+  filter: blur(18px) saturate(1.2);
+  opacity: 0;
+  transform: rotate(-18deg) scale(0.72);
+  transition:
+    opacity 0.38s ease,
+    transform 0.8s cubic-bezier(0.19, 1, 0.22, 1),
+    right 0.8s cubic-bezier(0.19, 1, 0.22, 1),
+    top 0.8s cubic-bezier(0.19, 1, 0.22, 1),
+    border-radius 0.8s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .site-card:hover,
 .site-card:focus-visible {
   background: var(--card-bg);
-  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.14);
-  border-color: color-mix(in srgb, var(--card-accent) 46%, var(--border));
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.16);
+  border-color: color-mix(in srgb, var(--card-accent) 52%, var(--border));
   transform: translate3d(0, -5px, 0);
 }
 
+.site-card:hover::before,
+.site-card:focus-visible::before,
 .site-card.is-fill-active::before {
-  opacity: 1;
-  clip-path: circle(155% at 0 100%);
+  width: 260px;
+  height: 180px;
+  left: -64px;
+  bottom: -74px;
+  border-radius: 68% 32% 52% 48% / 42% 58% 42% 58%;
+  opacity: 0.72;
+  filter: blur(20px) saturate(1.35);
+  transform: rotate(13deg) scale(1.12);
+}
+
+.site-card:hover::after,
+.site-card:focus-visible::after,
+.site-card.is-fill-active::after {
+  right: -28px;
+  top: -28px;
+  opacity: 0.34;
+  border-radius: 38% 62% 48% 52% / 56% 42% 58% 44%;
+  transform: rotate(16deg) scale(1.08);
+}
+
+.site-card:hover i,
+.site-card:focus-visible i,
+.site-card:hover span,
+.site-card:focus-visible span {
+  transform: translate3d(0, -1px, 0);
 }
 
 .site-card i {
@@ -469,12 +533,14 @@ code {
   color: var(--card-accent);
   font-size: 20px;
   z-index: 1;
+  transition: transform 0.32s ease, color 0.32s ease;
 }
 
 .site-card span {
   position: relative;
   font-weight: 700;
   z-index: 1;
+  transition: transform 0.32s ease, color 0.32s ease;
 }
 
 .visit-timer {
