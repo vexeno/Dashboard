@@ -1,5 +1,6 @@
 :root {
   --radius: 10px;
+  --card-radius: 22px;
   --accent: #facc15;
   --text: #333;
   --muted: rgba(51, 51, 51, 0.66);
@@ -434,11 +435,11 @@ code {
   overflow: hidden;
   isolation: isolate;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--card-radius);
   color: var(--text);
   background: var(--card-bg);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.09);
-  transition: transform 0.32s ease, box-shadow 0.32s ease, border-color 0.32s ease, color 0.32s ease;
+  transition: transform 0.32s ease, box-shadow 0.32s ease, border-color 0.32s ease, color 0.32s ease, border-radius 0.32s ease;
 }
 
 .site-card:nth-child(1) {
