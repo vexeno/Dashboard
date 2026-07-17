@@ -83,6 +83,17 @@ const typingTexts = computed(() => {
 })
 
 const currentAvatar = computed(() => (isDark.value ? config.value.avatarDark : config.value.avatarLight))
+const particleTheme = computed(() => isDark.value
+  ? {
+      key: 'dark-particles',
+      colors: ['#ffffff', '#fde68a', '#c4b5fd'],
+      opacity: 0.48,
+    }
+  : {
+      key: 'light-particles',
+      colors: ['#111827', '#6b7280', '#b45309'],
+      opacity: 0.2,
+    })
 
 const splitSegmenter = typeof Intl !== 'undefined' && Intl.Segmenter
   ? new Intl.Segmenter(undefined, { granularity: 'grapheme' })
@@ -422,7 +433,15 @@ onUnmounted(() => {
   <main class="page" :class="{ 'dark-mode': isDark }">
     <SmoothCursor />
     <canvas ref="clickSparkCanvas" class="click-spark-canvas" aria-hidden="true"></canvas>
-    <Particles class="particles-layer" :move-particles-on-hover="true" aria-hidden="true" />
+    <Particles
+      :key="particleTheme.key"
+      class="particles-layer"
+      :style="{ '--particles-opacity': particleTheme.opacity }"
+      :particle-colors="particleTheme.colors"
+      :move-particles-on-hover="true"
+      :alpha-particles="true"
+      aria-hidden="true"
+    />
     <section class="hero" aria-label="个人导航页">
       <div class="profile">
         <div class="avatar-wrap">

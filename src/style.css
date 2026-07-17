@@ -1012,7 +1012,17 @@ code {
   z-index: 0;
   width: 100%;
   height: 100%;
+  opacity: var(--particles-opacity, 0.42);
+  mix-blend-mode: screen;
   pointer-events: none;
+}
+
+.page:not(.dark-mode) .particles-layer {
+  mix-blend-mode: multiply;
+}
+
+.dark-mode .particles-layer {
+  mix-blend-mode: screen;
 }
 
 .particles-layer canvas {
