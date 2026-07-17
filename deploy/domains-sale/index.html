@@ -35,6 +35,7 @@
       --background-image: url('/puzzle-light.svg');
       --page-overlay-a: rgba(255, 250, 235, 0.76);
       --page-overlay-b: rgba(239, 234, 219, 0.76);
+      --title-gradient: linear-gradient(90deg, #1f2937, #6b7280, #b45309, #1f2937);
       color-scheme: light;
     }
 
@@ -55,6 +56,7 @@
       --background-image: url('/puzzle-dark.svg');
       --page-overlay-a: rgba(20, 20, 20, 0.78);
       --page-overlay-b: rgba(28, 27, 24, 0.78);
+      --title-gradient: linear-gradient(90deg, #f8fafc, #fde68a, #c4b5fd, #f8fafc);
       color-scheme: dark;
     }
 
@@ -217,6 +219,17 @@
       font-size: clamp(24px, 4vw, 38px);
       line-height: 1;
       letter-spacing: -0.045em;
+    }
+
+    .gradient-title {
+      width: fit-content;
+      color: transparent;
+      background-image: var(--title-gradient);
+      background-size: 300% 100%;
+      background-position: 0% 50%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      animation: gradient-title-flow 8s linear infinite;
     }
 
     .panel-head p {
@@ -393,6 +406,26 @@
       z-index: 1;
     }
 
+    @keyframes gradient-title-flow {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .gradient-title {
+        animation: none;
+      }
+    }
+
     @media (max-width: 760px) {
       .page {
         width: min(100% - 24px, 1120px);
@@ -450,7 +483,7 @@
     <section class="domains-panel">
       <div class="panel-head">
         <div>
-          <h2>Domains For Sale</h2>
+          <h2 class="gradient-title">Domains For Sale</h2>
         </div>
         <a class="button" href="https://seehex.com" aria-label="Back to SeeHex home">Back Home</a>
       </div>
@@ -464,7 +497,7 @@
     </section>
 
       <section class="contact-card">
-        <div><h2>Interested?</h2><p>Contact me directly on Telegram</p></div>
+        <div><h2 class="gradient-title">Interested?</h2><p>Contact me directly on Telegram</p></div>
         <a class="button primary" href="https://t.me/vyoss" target="_blank" rel="noopener noreferrer">
           Telegram: @vyoss
         </a>
