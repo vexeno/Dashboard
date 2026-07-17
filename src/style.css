@@ -64,6 +64,9 @@ code {
   --border: rgba(193, 193, 193, 0.5);
   --shadow: 0 16px 50px rgba(0, 0, 0, 0.2);
   --background-image: url('/puzzle-light.svg');
+  --dock-tooltip-bg: #0b0b0b;
+  --dock-tooltip-text: #ffffff;
+  --dock-tooltip-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
   position: relative;
   display: flex;
   min-height: 100vh;
@@ -93,6 +96,9 @@ code {
   --border: rgba(255, 255, 255, 0.16);
   --shadow: 0 16px 50px rgba(0, 0, 0, 0.34);
   --background-image: url('/puzzle-dark.svg');
+  --dock-tooltip-bg: #ffffff;
+  --dock-tooltip-text: #171717;
+  --dock-tooltip-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
 }
 
 .hero {
@@ -234,9 +240,25 @@ code {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  align-items: center;
   gap: 13px;
   width: 100%;
   margin-top: 4px;
+}
+
+.action-dock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 64px;
+  padding: 8px;
+  overflow: visible;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--card-bg) 86%, transparent);
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(14px);
 }
 
 .action-holder {
@@ -259,10 +281,90 @@ code {
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
+.dock-item {
+  --dock-item-size: 48px;
+  --dock-scale: calc(var(--dock-item-size) / 48);
+  position: relative;
+  display: flex;
+  width: var(--dock-item-size);
+  height: 48px;
+  min-width: var(--dock-item-size);
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  transition: width 0.2s ease, min-width 0.2s ease;
+  will-change: width;
+}
+
+.dock-button {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  padding: 0;
+  border-radius: 999px;
+  font-size: 20px;
+  transform: scale(var(--dock-scale));
+  transform-origin: center;
+  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  box-shadow: none;
+  border-color: transparent;
+  will-change: transform;
+}
+
+.dock-tooltip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 13px);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 14px;
+  color: var(--dock-tooltip-text);
+  background: var(--dock-tooltip-bg);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: var(--dock-tooltip-shadow);
+  transform: translateX(-50%) translateY(6px) scale(0.96);
+  transform-origin: bottom center;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.dock-tooltip::after {
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  width: 10px;
+  height: 10px;
+  content: "";
+  border-radius: 2px;
+  background: var(--dock-tooltip-bg);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.dock-item:hover .dock-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
 .action-button:hover {
   color: #1d1d1d;
   background: var(--accent);
   border-color: rgba(250, 204, 21, 0.8);
+}
+
+.dock-button:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  border-color: transparent;
 }
 
 .muted-button {
@@ -627,7 +729,26 @@ code {
     gap: 10px;
   }
 
-  .action-button {
+  .action-dock {
+    height: 58px;
+    padding: 7px;
+  }
+
+  .dock-item {
+    --dock-scale: calc(var(--dock-item-size) / 44);
+    height: 44px;
+    min-height: 44px;
+  }
+
+  .dock-button {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 18px;
+  }
+
+  .action-button:not(.dock-button) {
     min-height: 39px;
     padding: 0 13px;
     font-size: 14px;
@@ -662,7 +783,7 @@ code {
     width: 100%;
   }
 
-  .action-button span,
+  .action-button:not(.dock-button) span,
   .site-card span {
     font-size: 13px;
   }
@@ -738,4 +859,34 @@ code {
   z-index: 9999;
   pointer-events: none;
   user-select: none;
+}
+
+.particles-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.particles-layer canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 0;
+}
+
+::view-transition-new(root) {
+  z-index: 1;
 }

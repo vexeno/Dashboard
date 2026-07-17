@@ -1,5 +1,7 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue'
+import Particles from './components/Particles.vue'
+import SmoothCursor from './components/SmoothCursor.vue'
 
 const defaultConfig = {
   configVersion: 5,
@@ -50,6 +52,11 @@ const showEmail = ref(false)
 const showEditor = ref(new URLSearchParams(window.location.search).has('edit'))
 const canEdit = showEditor.value
 const activeCard = ref(null)
+const dockMouseX = ref(null)
+const dockItemRefs = ref([])
+const dockBaseSize = 48
+const dockMagnification = 72
+const dockDistance = 140
 const cardHoverTimers = new Map()
 const elapsedSeconds = ref(0)
 const typedText = ref('')
@@ -76,7 +83,6 @@ const typingTexts = computed(() => {
 })
 
 const currentAvatar = computed(() => (isDark.value ? config.value.avatarDark : config.value.avatarLight))
-
 
 const splitSegmenter = typeof Intl !== 'undefined' && Intl.Segmenter
   ? new Intl.Segmenter(undefined, { granularity: 'grapheme' })
@@ -145,12 +151,76 @@ function normalizeConfig(nextConfig) {
   }
 }
 
-function toggleTheme() {
-  isDark.value = !isDark.value
+async function toggleTheme(event) {
+  const applyTheme = () => {
+    isDark.value = !isDark.value
+  }
+
+  if (!document.startViewTransition) {
+    applyTheme()
+    return
+  }
+
+  const x = event?.clientX ?? window.innerWidth / 2
+  const y = event?.clientY ?? window.innerHeight / 2
+  const endRadius = Math.hypot(
+    Math.max(x, window.innerWidth - x),
+    Math.max(y, window.innerHeight - y),
+  )
+
+  const transition = document.startViewTransition(applyTheme)
+  await transition.ready
+
+  document.documentElement.animate(
+    {
+      clipPath: [
+        'circle(0px at ' + x + 'px ' + y + 'px)',
+        'circle(' + endRadius + 'px at ' + x + 'px ' + y + 'px)',
+      ],
+    },
+    {
+      duration: 650,
+      easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+      pseudoElement: '::view-transition-new(root)',
+    },
+  )
 }
 
 function toggleEmail() {
   showEmail.value = !showEmail.value
+}
+
+function setDockItemRef(el, index) {
+  if (el) {
+    dockItemRefs.value[index] = el
+  }
+}
+
+function updateDockMouse(event) {
+  dockMouseX.value = event.clientX
+}
+
+function clearDockMouse() {
+  dockMouseX.value = null
+}
+
+function getDockItemVars(index) {
+  const item = dockItemRefs.value[index]
+  let influence = 0
+
+  if (item && dockMouseX.value !== null) {
+    const rect = item.getBoundingClientRect()
+    const center = rect.left + rect.width / 2
+    const distance = Math.abs(dockMouseX.value - center)
+    const progress = Math.max(0, 1 - distance / dockDistance)
+    influence = 1 - Math.pow(1 - progress, 3)
+  }
+
+  const size = dockBaseSize + (dockMagnification - dockBaseSize) * influence
+
+  return {
+    '--dock-item-size': size + 'px',
+  }
 }
 
 function queueCardFill(cardKey) {
@@ -350,7 +420,9 @@ onUnmounted(() => {
 
 <template>
   <main class="page" :class="{ 'dark-mode': isDark }">
+    <SmoothCursor />
     <canvas ref="clickSparkCanvas" class="click-spark-canvas" aria-hidden="true"></canvas>
+    <Particles class="particles-layer" :move-particles-on-hover="true" aria-hidden="true" />
     <section class="hero" aria-label="个人导航页">
       <div class="profile">
         <div class="avatar-wrap">
@@ -396,31 +468,60 @@ onUnmounted(() => {
       </div>
 
       <div class="actions" aria-label="快捷操作">
-        <div class="action-holder">
-          <button class="action-button" type="button" @click="toggleEmail">
-            <i class="fa-solid fa-envelope"></i>
-            <span>Email</span>
-          </button>
-          <Transition name="float">
-            <div v-if="showEmail" class="email-popover">
-              <a v-for="email in config.contacts" :key="email" :href="`mailto:${email}`">{{ email }}</a>
-            </div>
-          </Transition>
-        </div>
+        <div class="action-dock" role="toolbar" aria-label="Email, Github and theme" @mousemove="updateDockMouse" @mouseleave="clearDockMouse">
+          <div
+            :ref="(el) => setDockItemRef(el, 0)"
+            class="dock-item action-holder"
+            :style="getDockItemVars(0)"
+          >
+            <button class="action-button dock-button" type="button" aria-label="Email" @click="toggleEmail">
+              <i class="fa-solid fa-envelope"></i>
+            </button>
+            <span class="dock-tooltip">Email</span>
+            <Transition name="float">
+              <div v-if="showEmail" class="email-popover">
+                <a v-for="email in config.contacts" :key="email" :href="`mailto:${email}`">{{ email }}</a>
+              </div>
+            </Transition>
+          </div>
 
-        <a class="action-button" :href="config.github" target="_blank" rel="noreferrer">
-          <i class="fa-brands fa-github"></i>
-          <span>Github</span>
-        </a>
+          <div
+            :ref="(el) => setDockItemRef(el, 1)"
+            class="dock-item action-holder"
+            :style="getDockItemVars(1)"
+          >
+            <a
+              class="action-button dock-button"
+              :href="config.github"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Github"
+            >
+              <i class="fa-brands fa-github"></i>
+            </a>
+            <span class="dock-tooltip">Github</span>
+          </div>
+
+          <div
+            :ref="(el) => setDockItemRef(el, 2)"
+            class="dock-item action-holder"
+            :style="getDockItemVars(2)"
+          >
+            <button
+              class="action-button dock-button"
+              type="button"
+              :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+              @click="toggleTheme($event)"
+            >
+              <i :class="isDark ? 'fa-solid fa-moon' : 'fa-solid fa-sun'"></i>
+            </button>
+            <span class="dock-tooltip">{{ isDark ? 'Dark' : 'Light' }}</span>
+          </div>
+        </div>
 
         <button v-if="canEdit" class="action-button" type="button" @click="openEditor">
           <i class="fa-solid fa-sliders"></i>
           <span>编辑</span>
-        </button>
-
-        <button class="action-button" type="button" @click="toggleTheme">
-          <i :class="isDark ? 'fa-solid fa-moon' : 'fa-solid fa-sun'"></i>
-          <span>{{ isDark ? 'Dark' : 'Light' }}</span>
         </button>
       </div>
 
@@ -443,6 +544,7 @@ onUnmounted(() => {
           <span>{{ card.label }}</span>
         </a>
       </nav>
+
     </section>
 
     <div class="visit-timer" aria-label="停留时间" @mousemove="moveTimerSpotlight">
