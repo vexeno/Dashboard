@@ -1009,6 +1009,36 @@ code {
   z-index: 1;
 }
 
+
+.intro.is-proximity-ready .seehex-split-title .proximity-char {
+  --prox: 0;
+  --prox-x: 0;
+  --prox-y: 0;
+  opacity: 1;
+  animation: none;
+  transform:
+    translate3d(
+      calc(var(--prox-x) * -5px),
+      calc(var(--prox-y) * -8px),
+      0
+    )
+    scale(calc(1 + var(--prox) * 0.045));
+  font-weight: calc(900 + var(--prox) * 80);
+  font-variation-settings: "wght" calc(900 + var(--prox) * 80);
+  text-shadow: 0 0 calc(var(--prox) * 18px) color-mix(in srgb, var(--accent) 35%, transparent);
+  transition:
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    font-weight 0.22s ease,
+    font-variation-settings 0.22s ease,
+    text-shadow 0.22s ease;
+}
+
+.intro.is-proximity-ready .title-main .name-style .proximity-char {
+  text-shadow:
+    0 0 calc(var(--prox) * 20px) color-mix(in srgb, var(--accent) 42%, transparent),
+    0 0 calc(var(--prox) * 8px) color-mix(in srgb, var(--text) 16%, transparent);
+}
+
 @keyframes seehexSplitTextRise {
   to {
     opacity: 1;

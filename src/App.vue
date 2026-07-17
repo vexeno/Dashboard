@@ -52,6 +52,7 @@ const showEmail = ref(false)
 const showEditor = ref(new URLSearchParams(window.location.search).has('edit'))
 const canEdit = showEditor.value
 const activeCard = ref(null)
+const introProximityReady = ref(false)
 const dockMouseX = ref(null)
 const dockItemRefs = ref([])
 const dockBaseSize = 48
@@ -65,6 +66,7 @@ const editorText = ref('')
 const editorError = ref('')
 let timerId
 let typingTimerId
+let introProximityTimerId
 let typingCharIndex = 0
 let clickSparkAnimationId
 const clickSparks = []
@@ -148,6 +150,36 @@ function resetCardGlow(event) {
   const card = event.currentTarget
   card.style.setProperty('--glow-x', '50%')
   card.style.setProperty('--glow-y', '50%')
+}
+
+function moveTitleProximity(event) {
+  if (!introProximityReady.value) return
+
+  const container = event.currentTarget
+  const chars = container.querySelectorAll('.proximity-char')
+  const radius = 120
+
+  chars.forEach((char) => {
+    const rect = char.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+    const distance = Math.hypot(event.clientX - centerX, event.clientY - centerY)
+    const proximity = Math.max(0, 1 - distance / radius)
+    const eased = 1 - Math.pow(1 - proximity, 3)
+
+    char.style.setProperty('--prox', eased.toFixed(3))
+    char.style.setProperty('--prox-x', ((event.clientX - centerX) / radius).toFixed(3))
+    char.style.setProperty('--prox-y', ((event.clientY - centerY) / radius).toFixed(3))
+  })
+}
+
+function resetTitleProximity(event) {
+  const container = event.currentTarget
+  container.querySelectorAll('.proximity-char').forEach((char) => {
+    char.style.setProperty('--prox', '0')
+    char.style.setProperty('--prox-x', '0')
+    char.style.setProperty('--prox-y', '0')
+  })
 }
 
 
@@ -319,6 +351,7 @@ function downloadConfig() {
 
 function resetTyping() {
   window.clearTimeout(typingTimerId)
+  window.clearTimeout(introProximityTimerId)
   stopClickSpark()
   typingCharIndex = 0
   typedText.value = ''
@@ -464,13 +497,13 @@ onUnmounted(() => {
           <img class="avatar" :src="currentAvatar" alt="SeeHex Logo" />
         </div>
 
-        <div class="intro">
+        <div class="intro" :class="{ 'is-proximity-ready': introProximityReady }" @mousemove="moveTitleProximity" @mouseleave="resetTitleProximity">
           <h1 class="title-hi seehex-split-title" aria-label="Hi">
             <span aria-hidden="true" class="seehex-split-line">
               <span
                 v-for="(part, index) in hiChars"
                 :key="'hi-' + index + '-' + part.char"
-                class="seehex-split-char"
+                class="seehex-split-char proximity-char"
                 :style="{ '--i': index, '--split-base': 0 }"
               >{{ part.display }}</span>
             </span>
@@ -480,15 +513,15 @@ onUnmounted(() => {
               <span
                 v-for="(part, index) in headlinePrefixChars"
                 :key="'prefix-' + index + '-' + part.char"
-                class="seehex-split-char"
+                class="seehex-split-char proximity-char"
                 :style="{ '--i': index, '--split-base': 5 }"
               >{{ part.display }}</span>
-              <span class="seehex-split-char" :style="{ '--i': headlinePrefixChars.length, '--split-base': 5 }">&nbsp;</span>
+              <span class="seehex-split-char proximity-char" :style="{ '--i': headlinePrefixChars.length, '--split-base': 5 }">&nbsp;</span>
               <span class="name-style">
                 <span
                   v-for="(part, index) in headlineNameChars"
                   :key="'name-' + index + '-' + part.char"
-                  class="seehex-split-char"
+                  class="seehex-split-char proximity-char"
                   :style="{ '--i': headlinePrefixChars.length + 1 + index, '--split-base': 5 }"
                 >{{ part.display }}</span>
               </span>
